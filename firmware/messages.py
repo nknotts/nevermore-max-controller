@@ -1,5 +1,9 @@
-from .messagepacket import MessagePacket
 import struct
+
+try:
+    from messagepacket import MessagePacket
+except ImportError:
+    from .messagepacket import MessagePacket
 
 
 class MessageParseError(Exception):
