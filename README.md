@@ -1,5 +1,6 @@
-Nevermore Max Controller
-========================
+![Unit Tests](https://github.com/nknotts/nevermore-max-controller/actions/workflows/python.yml/badge.svg)
+
+# Nevermore Max Controller
 
 Nevermore Max Controller source code
 
@@ -7,13 +8,11 @@ Nevermore Max Controller source code
 * Free software: MIT license
 
 
-Features
---------
+## Features
 
 * TODO
 
-Credits
--------
+## Credits
 
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
