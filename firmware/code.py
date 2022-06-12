@@ -69,23 +69,39 @@ async def usb_read_loop():
         await asyncio.sleep(0)
 
 
-def sim_value(min: float, max: float, freq_hz: float, random_range: float):
-    t = time.monotonic() - t0
+def sim_value(
+    min: float, max: float, period_s: float, phase_s: float, random_range: float
+):
+    t_s = (time.monotonic() - t0) + phase_s
+    freq_hz = 1.0 / period_s
     mid = (min + max) / 2.0
     amp = (max - min) / 2.0
     rand = random.uniform(-random_range, random_range)
-    return mid + amp * math.sin(2 * math.pi * freq_hz * t) + rand
+    return mid + amp * math.sin(2 * math.pi * freq_hz * t_s) + rand
 
 
 def collect_sensor_data():
     uart = usb_cdc.data
 
-    temp_C = sim_value(20, 25, 0.01, 0.25)
-    humidity = sim_value(40, 50, 0.05, 0.5)
-    pressure_kPa = sim_value(95, 100, 0.025, 0.5)
-
     sensor_data = messages.SensorReading(
-        temp_C=temp_C, humidity=humidity, pressure_kPa=pressure_kPa
+        in_dht_temp_C=sim_value(20, 25, 60, 0, 0.25),
+        in_dht_humidity_rh=sim_value(40, 50, 120, 0, 0.75),
+        in_sgp_eCO2=sim_value(100, 200, 30, 0, 2),
+        in_sgp_TVOC=sim_value(10, 15, 60, 0, 0.5),
+        in_bme_temp_C=sim_value(20, 25, 60, -2, 0.25),
+        in_bme_gas=sim_value(75, 100, 200, 0, 1),
+        in_bme_humidity_rh=sim_value(40, 50, 120, -2, 0.75),
+        in_bme_pressure_hPa=sim_value(990, 1100, 90, 0, 5),
+        in_bme_altitude_m=sim_value(500, 550, 60, 0, 2),
+        out_dht_temp_C=sim_value(20, 25, 60, 2, 0.25),
+        out_dht_humidity_rh=sim_value(40, 50, 120, 2, 0.75),
+        out_sgp_eCO2=sim_value(100, 200, 30, 2, 2),
+        out_sgp_TVOC=sim_value(10, 15, 60, 2, 0.5),
+        out_bme_temp_C=sim_value(20, 25, 60, 4, 0.25),
+        out_bme_gas=sim_value(75, 100, 200, 2, 1),
+        out_bme_humidity_rh=sim_value(40, 50, 120, 4, 0.75),
+        out_bme_pressure_hPa=sim_value(990, 1100, 90, 2, 5),
+        out_bme_altitude_m=sim_value(500, 550, 60, 2, 2),
     )
     uart.write(sensor_data.serialize())
     print_ttag(f"Sending: {sensor_data}")

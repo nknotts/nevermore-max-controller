@@ -109,16 +109,52 @@ class StateChangeResponse:
 
 class SensorReading:
     MsgId = 0x82
-    PayloadLength = 12
-    StructFormat = "<fff"  # should match payload length
 
-    def __init__(self, temp_C: float, humidity: float, pressure_kPa: float):
-        self.temp_C = temp_C
-        self.humidity = humidity
-        self.pressure_kPa = pressure_kPa
+    StructFormat = "<HHHHfffffHHHHfffff"  # should match payload length
+    PayloadLength = struct.calcsize(StructFormat)
+
+    def __init__(
+        self,
+        in_dht_temp_C: int,
+        in_dht_humidity_rh: int,
+        in_sgp_eCO2: int,
+        in_sgp_TVOC: int,
+        in_bme_temp_C: float,
+        in_bme_gas: float,
+        in_bme_humidity_rh: float,
+        in_bme_pressure_hPa: float,
+        in_bme_altitude_m: float,
+        out_dht_temp_C: int,
+        out_dht_humidity_rh: int,
+        out_sgp_eCO2: int,
+        out_sgp_TVOC: int,
+        out_bme_temp_C: float,
+        out_bme_gas: float,
+        out_bme_humidity_rh: float,
+        out_bme_pressure_hPa: float,
+        out_bme_altitude_m: float,
+    ):
+        self.in_dht_temp_C = in_dht_temp_C
+        self.in_dht_humidity_rh = in_dht_humidity_rh
+        self.in_sgp_eCO2 = in_sgp_eCO2
+        self.in_sgp_TVOC = in_sgp_TVOC
+        self.in_bme_temp_C = in_bme_temp_C
+        self.in_bme_gas = in_bme_gas
+        self.in_bme_humidity_rh = in_bme_humidity_rh
+        self.in_bme_pressure_hPa = in_bme_pressure_hPa
+        self.in_bme_altitude_m = in_bme_altitude_m
+        self.out_dht_temp_C = out_dht_temp_C
+        self.out_dht_humidity_rh = out_dht_humidity_rh
+        self.out_sgp_eCO2 = out_sgp_eCO2
+        self.out_sgp_TVOC = out_sgp_TVOC
+        self.out_bme_temp_C = out_bme_temp_C
+        self.out_bme_gas = out_bme_gas
+        self.out_bme_humidity_rh = out_bme_humidity_rh
+        self.out_bme_pressure_hPa = out_bme_pressure_hPa
+        self.out_bme_altitude_m = out_bme_altitude_m
 
     def __repr__(self):
-        return f"SensorReading(temp_C={self.temp_C:.1f}, humidity={self.humidity:.1f}, pressure_kPa={self.pressure_kPa:.1f})"
+        return f"SensorReading(tempC_in={self.in_bme_temp_C:.1f}, tempC_out={self.out_bme_temp_C:.1f}, RH_in={self.in_bme_humidity_rh:.1f}, RH_out={self.out_bme_humidity_rh:.1f}, hPa_in={self.in_bme_pressure_hPa:.1f}, hPa_out={self.out_bme_pressure_hPa:.1f}, eCO2_in={self.in_sgp_eCO2:.1f}, eCO2_out={self.out_sgp_eCO2:.1f}, TVOC_in={self.in_sgp_TVOC:.1f}, TVOC_out={self.out_sgp_TVOC:.1f}"
 
     @staticmethod
     def from_message(msg: MessagePacket):
@@ -133,6 +169,24 @@ class SensorReading:
         return MessagePacket(
             self.MsgId,
             struct.pack(
-                self.StructFormat, self.temp_C, self.humidity, self.pressure_kPa
+                self.StructFormat,
+                int(self.in_dht_temp_C),
+                int(self.in_dht_humidity_rh),
+                int(self.in_sgp_eCO2),
+                int(self.in_sgp_TVOC),
+                self.in_bme_temp_C,
+                self.in_bme_gas,
+                self.in_bme_humidity_rh,
+                self.in_bme_pressure_hPa,
+                self.in_bme_altitude_m,
+                int(self.out_dht_temp_C),
+                int(self.out_dht_humidity_rh),
+                int(self.out_sgp_eCO2),
+                int(self.out_sgp_TVOC),
+                self.out_bme_temp_C,
+                self.out_bme_gas,
+                self.out_bme_humidity_rh,
+                self.out_bme_pressure_hPa,
+                self.out_bme_altitude_m,
             ),
         ).serialize()

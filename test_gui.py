@@ -26,12 +26,30 @@ SERIAL_REFRESH_TAG = "serial_refresh"
 TEXT_BOX_TAG = "text_box"
 SAVE_BOX_TAG = "save_box"
 STATE_SLIDER_TAG = "state_slider"
-TEMPERATURE_SERIES_TAG = "temperature_series"
 TEMPERATURE_TIME_TAG = "temperature_time"
 TEMPERATURE_VALUE_TAG = "temperature_value"
-HUMIDITY_SERIES_TAG = "humidity_plot"
+IN_DHT_TEMP_SERIES_TAG = "in_dht_temp_series"
+OUT_DHT_TEMP_SERIES_TAG = "out_dht_temp_series"
+IN_BME_TEMP_SERIES_TAG = "in_bme_temp_series"
+OUT_BME_TEMP_SERIES_TAG = "out_bme_temp_series"
 HUMIDITY_TIME_TAG = "humidity_time"
 HUMIDITY_VALUE_TAG = "humidity_value"
+IN_DHT_HUMIDITY_SERIES_TAG = "in_dht_humidity_series"
+OUT_DHT_HUMIDITY_SERIES_TAG = "out_dht_humidity_series"
+IN_BME_HUMIDITY_SERIES_TAG = "in_bme_humidity_series"
+OUT_BME_HUMIDITY_SERIES_TAG = "out_bme_humidity_series"
+IN_PRESSURE_SERIES_TAG = "in_pressure_series"
+OUT_PRESSURE_SERIES_TAG = "out_pressure_series"
+PRESSURE_TIME_TAG = "pressure_time"
+PRESSURE_VALUE_TAG = "pressure_value"
+IN_CO2_SERIES_TAG = "in_co2_series"
+OUT_CO2_SERIES_TAG = "out_co2_series"
+CO2_TIME_TAG = "co2_time"
+CO2_VALUE_TAG = "co2_value"
+IN_TVOC_SERIES_TAG = "in_tvoc_series"
+OUT_TVOC_SERIES_TAG = "out_tvoc_series"
+TVOC_TIME_TAG = "tvoc_time"
+TVOC_VALUE_TAG = "tvco_value"
 
 
 def save_clicked(sender, app_data):
@@ -132,8 +150,20 @@ def get_serial_ports():
 
 MAX_DATA_LEN = 300
 
-temperature_data = deque([], maxlen=MAX_DATA_LEN)
-humidity_data = deque([], maxlen=MAX_DATA_LEN)
+in_dht_temp_data = deque([], maxlen=MAX_DATA_LEN)
+out_dht_temp_data = deque([], maxlen=MAX_DATA_LEN)
+in_bme_temp_data = deque([], maxlen=MAX_DATA_LEN)
+out_bme_temp_data = deque([], maxlen=MAX_DATA_LEN)
+in_dht_humidity_data = deque([], maxlen=MAX_DATA_LEN)
+out_dht_humidity_data = deque([], maxlen=MAX_DATA_LEN)
+in_bme_humidity_data = deque([], maxlen=MAX_DATA_LEN)
+out_bme_humidity_data = deque([], maxlen=MAX_DATA_LEN)
+in_co2_data = deque([], maxlen=MAX_DATA_LEN)
+out_co2_data = deque([], maxlen=MAX_DATA_LEN)
+in_tvoc_data = deque([], maxlen=MAX_DATA_LEN)
+out_tvoc_data = deque([], maxlen=MAX_DATA_LEN)
+in_pressure_data = deque([], maxlen=MAX_DATA_LEN)
+out_pressure_data = deque([], maxlen=MAX_DATA_LEN)
 
 
 def plot_data(data: deque, val):
@@ -151,17 +181,78 @@ def received_msg(msg: messagepacket.MessagePacket):
             logging.info(f"Received: {resp}")
         elif msg.msg_id == messages.SensorReading.MsgId:
             sensor_data = messages.SensorReading.from_message(msg)
-            global temperature_data, humidity_data
+            logging.info(f"GOT SENSOR: {sensor_data}")
+            global in_dht_temp_data, out_dht_temp_data, in_bme_temp_data, out_bme_temp_data, humidity_data
             dpg.set_value(
-                TEMPERATURE_SERIES_TAG, plot_data(temperature_data, sensor_data.temp_C)
+                IN_DHT_TEMP_SERIES_TAG,
+                plot_data(in_dht_temp_data, sensor_data.in_dht_temp_C),
+            )
+            dpg.set_value(
+                OUT_DHT_TEMP_SERIES_TAG,
+                plot_data(out_dht_temp_data, sensor_data.out_dht_temp_C),
+            )
+            dpg.set_value(
+                IN_BME_TEMP_SERIES_TAG,
+                plot_data(in_bme_temp_data, sensor_data.in_bme_temp_C),
+            )
+            dpg.set_value(
+                OUT_BME_TEMP_SERIES_TAG,
+                plot_data(out_bme_temp_data, sensor_data.out_bme_temp_C),
             )
             dpg.fit_axis_data(TEMPERATURE_TIME_TAG)
             dpg.fit_axis_data(TEMPERATURE_VALUE_TAG)
+
             dpg.set_value(
-                HUMIDITY_SERIES_TAG, plot_data(humidity_data, sensor_data.humidity)
+                IN_DHT_HUMIDITY_SERIES_TAG,
+                plot_data(in_dht_humidity_data, sensor_data.in_dht_humidity_rh),
+            )
+            dpg.set_value(
+                OUT_DHT_HUMIDITY_SERIES_TAG,
+                plot_data(out_dht_humidity_data, sensor_data.out_dht_humidity_rh),
+            )
+            dpg.set_value(
+                IN_BME_HUMIDITY_SERIES_TAG,
+                plot_data(in_bme_humidity_data, sensor_data.in_bme_humidity_rh),
+            )
+            dpg.set_value(
+                OUT_BME_HUMIDITY_SERIES_TAG,
+                plot_data(out_bme_humidity_data, sensor_data.out_bme_humidity_rh),
             )
             dpg.fit_axis_data(HUMIDITY_TIME_TAG)
             dpg.fit_axis_data(HUMIDITY_VALUE_TAG)
+
+            dpg.set_value(
+                IN_PRESSURE_SERIES_TAG,
+                plot_data(in_pressure_data, sensor_data.in_bme_pressure_hPa),
+            )
+            dpg.set_value(
+                OUT_PRESSURE_SERIES_TAG,
+                plot_data(out_pressure_data, sensor_data.out_bme_pressure_hPa),
+            )
+            dpg.fit_axis_data(PRESSURE_TIME_TAG)
+            dpg.fit_axis_data(PRESSURE_VALUE_TAG)
+
+            dpg.set_value(
+                IN_CO2_SERIES_TAG,
+                plot_data(in_co2_data, sensor_data.in_sgp_eCO2),
+            )
+            dpg.set_value(
+                OUT_CO2_SERIES_TAG,
+                plot_data(out_co2_data, sensor_data.out_sgp_eCO2),
+            )
+            dpg.fit_axis_data(CO2_TIME_TAG)
+            dpg.fit_axis_data(CO2_VALUE_TAG)
+
+            dpg.set_value(
+                IN_TVOC_SERIES_TAG,
+                plot_data(in_tvoc_data, sensor_data.in_sgp_TVOC),
+            )
+            dpg.set_value(
+                OUT_TVOC_SERIES_TAG,
+                plot_data(out_tvoc_data, sensor_data.out_sgp_TVOC),
+            )
+            dpg.fit_axis_data(TVOC_TIME_TAG)
+            dpg.fit_axis_data(TVOC_VALUE_TAG)
         else:
             logging.error(f"Unhandled: {msg}")
     except messages.MessageParseError as e:
@@ -232,8 +323,8 @@ def main():
 
         dpg.add_button(label="Toggle", tag=SAVE_BOX_TAG)  # does nothing at the moment
 
-        with dpg.subplots(2, 1, label="Sensor Data", width=-1, height=-1):
-            with dpg.plot(label="Temperature"):
+        with dpg.subplots(5, 1, label="Sensor Data", width=-1, height=-1):
+            with dpg.plot():
                 dpg.add_plot_axis(
                     dpg.mvXAxis, label="Time", time=True, tag=TEMPERATURE_TIME_TAG
                 )
@@ -243,23 +334,134 @@ def main():
                 dpg.add_line_series(
                     x=[],
                     y=[],
-                    label="Temperature",
+                    label="DHT22 (In)",
                     parent=TEMPERATURE_VALUE_TAG,
-                    tag=TEMPERATURE_SERIES_TAG,
+                    tag=IN_DHT_TEMP_SERIES_TAG,
                 )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="DHT22 (Out)",
+                    parent=TEMPERATURE_VALUE_TAG,
+                    tag=OUT_DHT_TEMP_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (In)",
+                    parent=TEMPERATURE_VALUE_TAG,
+                    tag=IN_BME_TEMP_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (Out)",
+                    parent=TEMPERATURE_VALUE_TAG,
+                    tag=OUT_BME_TEMP_SERIES_TAG,
+                )
+                dpg.add_plot_legend()
 
             with dpg.plot():
                 dpg.add_plot_axis(
                     dpg.mvXAxis, label="Time", time=True, tag=HUMIDITY_TIME_TAG
                 )
-                dpg.add_plot_axis(dpg.mvYAxis, label="Humidity", tag=HUMIDITY_VALUE_TAG)
+                dpg.add_plot_axis(
+                    dpg.mvYAxis, label="Humidity (%)", tag=HUMIDITY_VALUE_TAG
+                )
                 dpg.add_line_series(
                     x=[],
                     y=[],
-                    label="Humidity",
+                    label="DHT22 (In)",
                     parent=HUMIDITY_VALUE_TAG,
-                    tag=HUMIDITY_SERIES_TAG,
+                    tag=IN_DHT_HUMIDITY_SERIES_TAG,
                 )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="DHT22 (Out)",
+                    parent=HUMIDITY_VALUE_TAG,
+                    tag=OUT_DHT_HUMIDITY_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (In)",
+                    parent=HUMIDITY_VALUE_TAG,
+                    tag=IN_BME_HUMIDITY_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (Out)",
+                    parent=HUMIDITY_VALUE_TAG,
+                    tag=OUT_BME_HUMIDITY_SERIES_TAG,
+                )
+                dpg.add_plot_legend()
+
+            with dpg.plot():
+                dpg.add_plot_axis(
+                    dpg.mvXAxis, label="Time", time=True, tag=PRESSURE_TIME_TAG
+                )
+                dpg.add_plot_axis(
+                    dpg.mvYAxis, label="Pressure (hPa)", tag=PRESSURE_VALUE_TAG
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (In)",
+                    parent=PRESSURE_VALUE_TAG,
+                    tag=IN_PRESSURE_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="BME680 (Out)",
+                    parent=PRESSURE_VALUE_TAG,
+                    tag=OUT_PRESSURE_SERIES_TAG,
+                )
+                dpg.add_plot_legend()
+
+            with dpg.plot():
+                dpg.add_plot_axis(
+                    dpg.mvXAxis, label="Time", time=True, tag=CO2_TIME_TAG
+                )
+                dpg.add_plot_axis(dpg.mvYAxis, label="CO2 (ppm)", tag=CO2_VALUE_TAG)
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="SGP30 (In)",
+                    parent=CO2_VALUE_TAG,
+                    tag=IN_CO2_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="SGP30 (Out)",
+                    parent=CO2_VALUE_TAG,
+                    tag=OUT_CO2_SERIES_TAG,
+                )
+                dpg.add_plot_legend()
+
+            with dpg.plot():
+                dpg.add_plot_axis(
+                    dpg.mvXAxis, label="Time", time=True, tag=TVOC_TIME_TAG
+                )
+                dpg.add_plot_axis(dpg.mvYAxis, label="TVOC (ppb)", tag=TVOC_VALUE_TAG)
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="SGP30 (In)",
+                    parent=TVOC_VALUE_TAG,
+                    tag=IN_TVOC_SERIES_TAG,
+                )
+                dpg.add_line_series(
+                    x=[],
+                    y=[],
+                    label="SGP30 (Out)",
+                    parent=TVOC_VALUE_TAG,
+                    tag=OUT_TVOC_SERIES_TAG,
+                )
+                dpg.add_plot_legend()
 
     update_serial_button_enablement()
 
