@@ -1,16 +1,15 @@
 import time
-import random
-import math
 
 import board
 import digitalio
 import asyncio
 import usb_cdc
 
+from sensordata import SimSensors as Sensors
 from messagepacket import MessageParser, MessagePacket
 import messages
 
-VERSION_STRING = "0.0.1"
+VERSION_STRING = "0.0.2"
 
 t0 = time.monotonic()
 led = digitalio.DigitalInOut(board.LED)
@@ -69,47 +68,20 @@ async def usb_read_loop():
         await asyncio.sleep(0)
 
 
-def sim_value(
-    min: float, max: float, period_s: float, phase_s: float, random_range: float
-):
-    t_s = (time.monotonic() - t0) + phase_s
-    freq_hz = 1.0 / period_s
-    mid = (min + max) / 2.0
-    amp = (max - min) / 2.0
-    rand = random.uniform(-random_range, random_range)
-    return mid + amp * math.sin(2 * math.pi * freq_hz * t_s) + rand
-
-
-def collect_sensor_data():
+def collect_sensor_data(sensors: Sensors):
     uart = usb_cdc.data
 
-    sensor_data = messages.SensorReading(
-        in_dht_temp_C=sim_value(20, 25, 60, 0, 0.25),
-        in_dht_humidity_rh=sim_value(40, 50, 120, 0, 0.75),
-        in_sgp_eCO2=sim_value(100, 200, 30, 0, 2),
-        in_sgp_TVOC=sim_value(10, 15, 60, 0, 0.5),
-        in_bme_temp_C=sim_value(20, 25, 60, -2, 0.25),
-        in_bme_gas=sim_value(75, 100, 200, 0, 1),
-        in_bme_humidity_rh=sim_value(40, 50, 120, -2, 0.75),
-        in_bme_pressure_hPa=sim_value(990, 1100, 90, 0, 5),
-        in_bme_altitude_m=sim_value(500, 550, 60, 0, 2),
-        out_dht_temp_C=sim_value(20, 25, 60, 2, 0.25),
-        out_dht_humidity_rh=sim_value(40, 50, 120, 2, 0.75),
-        out_sgp_eCO2=sim_value(100, 200, 30, 2, 2),
-        out_sgp_TVOC=sim_value(10, 15, 60, 2, 0.5),
-        out_bme_temp_C=sim_value(20, 25, 60, 4, 0.25),
-        out_bme_gas=sim_value(75, 100, 200, 2, 1),
-        out_bme_humidity_rh=sim_value(40, 50, 120, 4, 0.75),
-        out_bme_pressure_hPa=sim_value(990, 1100, 90, 2, 5),
-        out_bme_altitude_m=sim_value(500, 550, 60, 2, 2),
-    )
-    uart.write(sensor_data.serialize())
-    print_ttag(f"Sending: {sensor_data}")
+    sensor_data = sensors.sample()
+
+    msg = messages.SensorReading(*sensor_data.data())
+    uart.write(msg.serialize())
+    print_ttag(f"Sending: {msg}")
 
 
 async def main():
+    sensors = Sensors()
     await asyncio.gather(
-        schedule_task(collect_sensor_data, 1.0),
+        schedule_task(collect_sensor_data, 1.0, sensors),
         schedule_task(toggle_led, 0.5),
         usb_read_loop(),
     )

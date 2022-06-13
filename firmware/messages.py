@@ -154,7 +154,7 @@ class SensorReading:
         self.out_bme_altitude_m = out_bme_altitude_m
 
     def __repr__(self):
-        return f"SensorReading(tempC_in={self.in_bme_temp_C:.1f}, tempC_out={self.out_bme_temp_C:.1f}, RH_in={self.in_bme_humidity_rh:.1f}, RH_out={self.out_bme_humidity_rh:.1f}, hPa_in={self.in_bme_pressure_hPa:.1f}, hPa_out={self.out_bme_pressure_hPa:.1f}, eCO2_in={self.in_sgp_eCO2:.1f}, eCO2_out={self.out_sgp_eCO2:.1f}, TVOC_in={self.in_sgp_TVOC:.1f}, TVOC_out={self.out_sgp_TVOC:.1f}"
+        return f"SensorReading(in{{tempC={self.in_bme_temp_C:.1f}, RH={self.in_bme_humidity_rh:.1f}, hPa={self.in_bme_pressure_hPa:.1f}, eCO2={self.in_sgp_eCO2:.1f}, TVOC={self.in_sgp_TVOC:.1f}}}, out{{tempC={self.out_bme_temp_C:.1f}, RH={self.out_bme_humidity_rh:.1f}, hPa={self.out_bme_pressure_hPa:.1f}, eCO2={self.out_sgp_eCO2:.1f}, TVOC={self.out_sgp_TVOC:.1f}}}"
 
     @staticmethod
     def from_message(msg: MessagePacket):
