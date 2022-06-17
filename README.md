@@ -4,9 +4,6 @@
 
 Nevermore Max Controller source code
 
-
-* Free software: MIT license
-
 ## HOWTO
 
 ### Firmware
