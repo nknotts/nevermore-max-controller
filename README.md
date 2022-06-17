@@ -39,9 +39,60 @@ The `console` port refers to the REPL/interactive port, and the `data` port refe
 
 From the drop down, select the desired serial port. Selecting a serial port will automatically connect.
 
+### Klipper Plugin
+
+#### Manual Installation
+
+To install this plugin, you need to this entire project directory file into the `extras`
+folder of klipper. Like:
+
+```bash
+/home/pi/klipper/klippy/extras/nevermore-max-controller
+```
+
+An alternative would be to clone this repo and run the `install_klipper.sh` script. Like:
+
+```bash
+cd /home/pi
+git clone https://github.com/nknotts/nevermore-max-controller.git
+./nevermore-max-controller/install_klipper.sh
+```
+
+It's safe to execute the install script multiple times.
+
+More on this in the [Moonraker Update Manager](#moonraker-update-manager) section.
+
+#### Moonraker Update Manager
+
+It's possible to keep this extension up to date with the Moonraker's [update manager](https://github.com/Arksine/moonraker/blob/master/docs/configuration.md#update_manager) by
+adding this configuration block to the "moonraker.conf" of your printer:
+
+```text
+[update_manager client nevermore_max_controller]
+type: git_repo
+path: ~/nevermore_max_controller
+origin: https://github.com/nknotts/nevermore-max-controller.git
+install_script: install_klipper.sh
+managed_services: klipper
+```
+
+This requires this repository to be cloned into your home directory (e.g. /home/pi):
+
+```bash
+git clone https://github.com/nknotts/nevermore-max-controller.git
+```
+
+The install script assumes that Klipper is also installed in your home directory under
+"klipper": `${HOME}/klipper`.
+
+>:point_up: **NOTE:** If your Moonraker is not on a recent version, you may get an error
+> with the "managed_services" line!
+
+
 ## Credits
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-* [Cookiecutter](https://github.com/audreyr/cookiecutter)
-* [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage)
+* [VORON](https://vorondesign.com/) - great open source 3D printer hardware design and community
+* [Klipper](https://github.com/Klipper3d/klipper) - great open source 3D printer firmware
+* [Klipper Z Calibration](https://github.com/protoloft/klipper_z_calibration) - basis for install scripts
+* [Cookiecutter](https://github.com/audreyr/cookiecutter) - project template
+* [audreyr/cookiecutter-pypackage](https://github.com/audreyr/cookiecutter-pypackage) - project template
