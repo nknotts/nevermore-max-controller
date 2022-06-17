@@ -20,7 +20,7 @@ The firmware is written in [CircuitPython](https://docs.circuitpython.org/en/7.3
 
 ### Test GUI
 
-A Python REPL and data connection are archeived over a single USB connection to the Pi Pico. See [usb_cdc](https://docs.circuitpython.org/en/7.3.x/shared-bindings/usb_cdc/index.html#module-usb_cdc) for more.
+A Python REPL and data connection are achieved over a single USB connection to the Pi Pico. See [usb_cdc](https://docs.circuitpython.org/en/7.3.x/shared-bindings/usb_cdc/index.html#module-usb_cdc) for more.
 
 ```
 On Windows, each Serial is visible as a separate COM port. The ports will often be assigned consecutively, console first, but this is not always true.
