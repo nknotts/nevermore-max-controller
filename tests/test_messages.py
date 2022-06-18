@@ -6,8 +6,8 @@
 import pytest
 
 
-from ..firmware import messages
-from ..firmware import messagepacket
+from nevermoremax.firmware import messages
+from nevermoremax.firmware import messagepacket
 
 
 def parse_msg(msg: bytes):

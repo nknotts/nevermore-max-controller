@@ -6,9 +6,9 @@ import argparse
 
 import serial
 
-from firmware import messagepacket
-from firmware import messages
-from firmware import sensorssim
+from nevermoremax.firmware import messagepacket
+from nevermoremax.firmware import messages
+from nevermoremax.firmware import sensorssim
 
 
 def received_msg(msg: messagepacket.MessagePacket, ser: serial.Serial):
