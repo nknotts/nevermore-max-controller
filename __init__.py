@@ -1,4 +1,4 @@
-from klipper.controller import NevermoreMaxController
+from .klipper.controller import NevermoreMaxController
 
 
 def load_config(config):

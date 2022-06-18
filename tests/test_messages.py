@@ -6,14 +6,14 @@
 import pytest
 
 
-from firmware import messages
-from firmware import messagepacket
+from ..firmware import messages
+from ..firmware import messagepacket
 
 
 def parse_msg(msg: bytes):
     parser = messagepacket.MessageParser()
     parser.append(msg)
-    msg = parser.parse()
+    msg, _ = parser.parse()
     assert msg
     return msg
 

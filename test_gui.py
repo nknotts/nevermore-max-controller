@@ -10,9 +10,12 @@ import serial.tools.list_ports
 
 import dearpygui.dearpygui as dpg
 
-from firmware import messagepacket
-from firmware import messages
-
+try:
+    from .firmware import messagepacket
+    from .firmware import messages
+except ImportError:
+    from firmware import messagepacket
+    from firmware import messages
 
 ser: Union[None, serial.Serial] = None
 
