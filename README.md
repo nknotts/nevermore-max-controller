@@ -14,7 +14,7 @@ The firmware is written in [CircuitPython](https://docs.circuitpython.org/en/7.3
 
 * Connect the Pi Pico USB to your laptop
 * Ensure CircuitPython 7.3 is installed on the Pico.
-* Copy the full contents of the [firmware](firmware) folder to the root of the Pi Pico (volume name `CIRCUITPY`)
+* Copy the full contents of the [nevermoremax/firmware](nevermoremax/firmware) folder to the root of the Pi Pico (volume name `CIRCUITPY`)
 * Anytime `boot.py` is modified, power cycle the Pico for the changes to take effect.
 
 
