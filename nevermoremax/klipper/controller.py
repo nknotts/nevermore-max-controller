@@ -21,5 +21,5 @@ class NevermoreMaxController:
         if msg:
             self._received_message(msg)
 
-    def _received_message(self, msg: messagepacket.MessagePacket):
+    def _received_message(self, msg):
         logging.info("Received NMC Msg", msg)

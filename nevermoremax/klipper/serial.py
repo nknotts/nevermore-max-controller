@@ -65,8 +65,8 @@ class SerialPort(object):
         attrs[CC][termios.VTIME] = 20
         termios.tcsetattr(self.fd, termios.TCSANOW, attrs)
 
-    def write(self, str: bytes):
+    def write(self, str):
         os.write(self.fd, str)
 
-    def read(self) -> bytes:
+    def read(self):
         return os.read(self.fd, 1024)
