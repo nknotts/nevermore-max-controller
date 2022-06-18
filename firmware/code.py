@@ -5,7 +5,8 @@ import digitalio
 import asyncio
 import usb_cdc
 
-from sensordata import SimSensors as Sensors
+# from sensors import Sensors
+from sensorssim import SimSensors as Sensors
 from messagepacket import MessageParser, MessagePacket
 import messages
 
