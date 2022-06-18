@@ -273,7 +273,7 @@ def main():
         except OSError:
             logging.error(f"Read Error - closing")
             close_serial()
-        msg = parser.parse()
+        msg, _ = parser.parse()
         if msg:
             received_msg(msg)
 

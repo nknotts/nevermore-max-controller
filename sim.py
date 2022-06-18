@@ -40,7 +40,7 @@ def main(port):
             t_last = now
             msg = messages.SensorReading(*sensors.sample().data())
             ser.write(msg.serialize())
-        msg = parser.parse()
+        msg, _ = parser.parse()
         if msg:
             received_msg(msg, ser)
 

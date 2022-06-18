@@ -17,7 +17,7 @@ class NevermoreMaxController:
     def _serial_data_ready(self, eventtime):
         data = self.serial.read()
         self.serial_parser.append(data)
-        msg = self.serial_parser.parse()
+        msg, _ = self.serial_parser.parse()
         if msg:
             self._received_message(msg)
 

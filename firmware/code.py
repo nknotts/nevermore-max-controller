@@ -63,7 +63,7 @@ async def usb_read_loop():
     while True:
         if uart.in_waiting > 0:
             parser.append(uart.read(uart.in_waiting))
-        msg = parser.parse()
+        msg, _ = parser.parse()
         if msg:
             received_msg(msg)
         await asyncio.sleep(0)

@@ -70,33 +70,36 @@ class MessageParser:
                 break
 
         if sync_pos < 0:
+            # sync not found
             self._buf = bytearray([])
-            return
+            return None, False
 
         self._buf = self._buf[sync_pos:]
         buffer_len = len(self._buf)
 
         if buffer_len < META_LEN:
             # need more data
-            return
+            return None, False
 
         msg_len = self._buf[1]
         if msg_len > MAX_MSG_LEN or msg_len < META_LEN:
             # invalid length
             print("invalid length")
             self._buf = self._buf[1:]
-            return
+            return None, True
 
         if buffer_len < msg_len:
             # need more data
-            return
+            return None, False
 
         packet = self._buf[:msg_len]
         crc_read = calc_crc8(packet)
         if crc_read != 0:
+            # invalid crc
             print(f"Missing end sync")
             self._buf = self._buf[1:]
-            return
+            return None, True
 
+        # success!
         self._buf = self._buf[msg_len:]
-        return MessagePacket(packet[2], packet[3:-1])
+        return MessagePacket(packet[2], packet[3:-1]), True
