@@ -159,7 +159,7 @@ class SensorReading:
         return f"SensorReading(in{{tempC={self.in_bme_temp_C:.1f}, RH={self.in_bme_humidity_rh:.1f}, hPa={self.in_bme_pressure_hPa:.1f}, eCO2={self.in_sgp_eCO2:.1f}, TVOC={self.in_sgp_TVOC:.1f}}}, out{{tempC={self.out_bme_temp_C:.1f}, RH={self.out_bme_humidity_rh:.1f}, hPa={self.out_bme_pressure_hPa:.1f}, eCO2={self.out_sgp_eCO2:.1f}, TVOC={self.out_sgp_TVOC:.1f}}}"
 
     @staticmethod
-    def from_message(msg: MessagePacket):
+    def from_message(msg):
         if msg.msg_id != SensorReading.MsgId:
             raise MessageIdError()
         if len(msg.payload) != SensorReading.PayloadLength:
@@ -167,7 +167,7 @@ class SensorReading:
         data = struct.unpack(SensorReading.StructFormat, msg.payload)
         return SensorReading(*data)
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         return MessagePacket(
             self.MsgId,
             struct.pack(
