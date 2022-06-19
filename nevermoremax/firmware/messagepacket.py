@@ -1,7 +1,5 @@
 # pylint: disable=line-too-long
 
-import struct
-
 START_BYTE = 0xA5
 META_LEN = 4  # start_byte + msg_id + len + crc
 MAX_MSG_LEN = 64
@@ -18,9 +16,10 @@ class MessagePacket:
 
     def serialize(self):
         msg_len = len(self.payload) + META_LEN
-        out = bytes(struct.pack("BBB", START_BYTE, msg_len, self.msg_id) + self.payload)
-        crc = calc_crc8(out)
-        return out + bytes(struct.pack("B", crc))
+        out = bytearray([START_BYTE, msg_len, self.msg_id])
+        out.extend(self.payload)
+        out.append(calc_crc8(out))
+        return bytes(out)
 
     def __repr__(self):
         return "MessagePacket(msg_id=0x{:02X}, payload_len={}, payload='{}')".format(
