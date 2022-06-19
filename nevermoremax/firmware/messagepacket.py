@@ -1,3 +1,4 @@
+# -*- coding: future_fstrings -*-
 # pylint: disable=line-too-long
 
 import struct

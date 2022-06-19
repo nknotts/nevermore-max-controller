@@ -2,5 +2,6 @@ flake8==3.9.2
 pytest==4.6.11
 black==22.3.0; python_version >= '3.6'
 
+future_fstrings==1.2.0; python_version < '3.6'
 pyserial==3.5.0
 dearpygui==1.6.2; python_version >= '3.6'
