@@ -1,5 +1,3 @@
-# -*- coding: future_fstrings -*-
-
 import struct
 
 try:
@@ -49,7 +47,7 @@ class VersionResponse:
         self.version = version
 
     def __repr__(self):
-        return f"VersionResponse(version={self.version})"
+        return "VersionResponse(version={})".format(self.version)
 
     @staticmethod
     def from_message(msg):
@@ -71,7 +69,7 @@ class StateChangeRequest:
         self.state = state
 
     def __repr__(self):
-        return f"StateChangeRequest(state=0x{self.state:02X})"
+        return "StateChangeRequest(state=0x{:02X})".format(self.state)
 
     @staticmethod
     def from_message(msg):
@@ -94,7 +92,7 @@ class StateChangeResponse:
         self.state = state
 
     def __repr__(self):
-        return f"StateChangeResponse(state=0x{self.state:02X})"
+        return "StateChangeResponse(state=0x{:02X})".format(self.state)
 
     @staticmethod
     def from_message(msg):
@@ -156,7 +154,18 @@ class SensorReading:
         self.out_bme_altitude_m = out_bme_altitude_m
 
     def __repr__(self):
-        return f"SensorReading(in{{tempC={self.in_bme_temp_C:.1f}, RH={self.in_bme_humidity_rh:.1f}, hPa={self.in_bme_pressure_hPa:.1f}, eCO2={self.in_sgp_eCO2:.1f}, TVOC={self.in_sgp_TVOC:.1f}}}, out{{tempC={self.out_bme_temp_C:.1f}, RH={self.out_bme_humidity_rh:.1f}, hPa={self.out_bme_pressure_hPa:.1f}, eCO2={self.out_sgp_eCO2:.1f}, TVOC={self.out_sgp_TVOC:.1f}}}"
+        return "SensorReading(in{{tempC={:.1f}, RH={:.1f}, hPa={:.1f}, eCO2={:.1f}, TVOC={:.1f}}}, out{{tempC={:.1f}, RH={:.1f}, hPa={:.1f}, eCO2={:.1f}, TVOC={:.1f}}}".format(
+            self.in_bme_temp_C,
+            self.in_bme_humidity_rh,
+            self.in_bme_pressure_hPa,
+            self.in_sgp_eCO2,
+            self.in_sgp_TVOC,
+            self.out_bme_temp_C,
+            self.out_bme_humidity_rh,
+            self.out_bme_pressure_hPa,
+            self.out_sgp_eCO2,
+            self.out_sgp_TVOC,
+        )
 
     @staticmethod
     def from_message(msg):

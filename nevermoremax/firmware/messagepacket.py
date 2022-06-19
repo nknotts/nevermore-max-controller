@@ -1,4 +1,3 @@
-# -*- coding: future_fstrings -*-
 # pylint: disable=line-too-long
 
 import struct
@@ -10,7 +9,7 @@ MAX_MSG_LEN = 64
 
 
 def bytes_repr(data):
-    return " ".join(f"{d:02X}" for d in data)
+    return " ".join("{:02X}".format(d) for d in data)
 
 
 class MessagePacket:
@@ -25,7 +24,9 @@ class MessagePacket:
         return out + struct.pack("B", crc)
 
     def __repr__(self):
-        return f"MessagePacket(msg_id=0x{self.msg_id:02X}, payload_len={len(self.payload)}, payload='{bytes_repr(self.payload)}')"
+        return "MessagePacket(msg_id=0x{:02X}, payload_len={}, payload='{}')".format(
+            self.msg_id, len(self.payload), bytes_repr(self.payload)
+        )
 
 
 # fmt: off
@@ -97,7 +98,7 @@ class MessageParser:
         crc_read = calc_crc8(packet)
         if crc_read != 0:
             # invalid crc
-            print(f"Missing end sync")
+            print("Missing end sync")
             self._buf = self._buf[1:]
             return None, True
 
