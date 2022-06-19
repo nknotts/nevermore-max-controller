@@ -22,4 +22,4 @@ jobs:
           pip install -r requirements_dev.txt
       - name: Test with pytest
         run: |
-          pytest
+          pytest --ignore=test_gui.py

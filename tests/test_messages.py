@@ -10,7 +10,7 @@ from nevermoremax.firmware import messages
 from nevermoremax.firmware import messagepacket
 
 
-def parse_msg(msg: bytes):
+def parse_msg(msg):
     parser = messagepacket.MessageParser()
     parser.append(msg)
     msg, _ = parser.parse()
