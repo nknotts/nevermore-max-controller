@@ -8,16 +8,16 @@ META_LEN = 4  # start_byte + msg_id + len + crc
 MAX_MSG_LEN = 64
 
 
-def bytes_repr(data: bytes):
+def bytes_repr(data):
     return " ".join(f"{d:02X}" for d in data)
 
 
 class MessagePacket:
-    def __init__(self, msg_id: int, payload: bytes):
+    def __init__(self, msg_id, payload):
         self.msg_id = msg_id
         self.payload = payload
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         msg_len = len(self.payload) + META_LEN
         out = struct.pack("BBB", START_BYTE, msg_len, self.msg_id) + self.payload
         crc = calc_crc8(out)
@@ -48,7 +48,7 @@ CRC_8_TABLE = [
 # fmt:on
 
 
-def calc_crc8(data: bytes):
+def calc_crc8(data):
     crc = 0
     for d in data:
         crc = CRC_8_TABLE[crc ^ d] & 0xFF
@@ -59,7 +59,7 @@ class MessageParser:
     def __init__(self):
         self._buf = bytearray([])
 
-    def append(self, data: bytes):
+    def append(self, data):
         self._buf.extend(data)
 
     def parse(self):

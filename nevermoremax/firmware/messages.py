@@ -26,14 +26,14 @@ class VersionRequest:
         return "VersionRequest()"
 
     @staticmethod
-    def from_message(msg: MessagePacket):
+    def from_message(msg):
         if msg.msg_id != VersionRequest.MsgId:
             raise MessageIdError()
         if len(msg.payload) != VersionRequest.PayloadLength:
             raise PayloadLengthError()
         return VersionRequest()
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         return MessagePacket(self.MsgId, b"").serialize()
 
 
@@ -41,7 +41,7 @@ class VersionResponse:
     MsgId = 0x80
     MaxPayloadLength = 60
 
-    def __init__(self, version: str):
+    def __init__(self, version):
         if len(version) > self.MaxPayloadLength:
             raise MessageParseError()
         self.version = version
@@ -50,14 +50,14 @@ class VersionResponse:
         return f"VersionResponse(version={self.version})"
 
     @staticmethod
-    def from_message(msg: MessagePacket):
+    def from_message(msg):
         if msg.msg_id != VersionResponse.MsgId:
             raise MessageIdError()
         if len(msg.payload) > VersionResponse.MaxPayloadLength:
             raise PayloadLengthError()
         return VersionResponse(msg.payload.decode())
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         return MessagePacket(self.MsgId, str.encode(self.version)).serialize()
 
 
@@ -65,14 +65,14 @@ class StateChangeRequest:
     MsgId = 0x01
     PayloadLength = 1
 
-    def __init__(self, state: int):
+    def __init__(self, state):
         self.state = state
 
     def __repr__(self):
         return f"StateChangeRequest(state=0x{self.state:02X})"
 
     @staticmethod
-    def from_message(msg: MessagePacket):
+    def from_message(msg):
         if msg.msg_id != StateChangeRequest.MsgId:
             raise MessageIdError()
         if len(msg.payload) != StateChangeRequest.PayloadLength:
@@ -80,7 +80,7 @@ class StateChangeRequest:
         data = struct.unpack("B", msg.payload)
         return StateChangeRequest(data[0])
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         return MessagePacket(self.MsgId, struct.pack("<B", self.state)).serialize()
 
 
@@ -88,14 +88,14 @@ class StateChangeResponse:
     MsgId = 0x81
     PayloadLength = 1
 
-    def __init__(self, state: int):
+    def __init__(self, state):
         self.state = state
 
     def __repr__(self):
         return f"StateChangeResponse(state=0x{self.state:02X})"
 
     @staticmethod
-    def from_message(msg: MessagePacket):
+    def from_message(msg):
         if msg.msg_id != StateChangeResponse.MsgId:
             raise MessageIdError()
         if len(msg.payload) != StateChangeResponse.PayloadLength:
@@ -103,7 +103,7 @@ class StateChangeResponse:
         data = struct.unpack("B", msg.payload)
         return StateChangeResponse(data[0])
 
-    def serialize(self) -> bytes:
+    def serialize(self):
         return MessagePacket(self.MsgId, struct.pack("<B", self.state)).serialize()
 
 
@@ -115,24 +115,24 @@ class SensorReading:
 
     def __init__(
         self,
-        in_dht_temp_C: int,
-        in_dht_humidity_rh: int,
-        in_sgp_eCO2: int,
-        in_sgp_TVOC: int,
-        in_bme_temp_C: float,
-        in_bme_gas: float,
-        in_bme_humidity_rh: float,
-        in_bme_pressure_hPa: float,
-        in_bme_altitude_m: float,
-        out_dht_temp_C: int,
-        out_dht_humidity_rh: int,
-        out_sgp_eCO2: int,
-        out_sgp_TVOC: int,
-        out_bme_temp_C: float,
-        out_bme_gas: float,
-        out_bme_humidity_rh: float,
-        out_bme_pressure_hPa: float,
-        out_bme_altitude_m: float,
+        in_dht_temp_C,
+        in_dht_humidity_rh,
+        in_sgp_eCO2,
+        in_sgp_TVOC,
+        in_bme_temp_C,
+        in_bme_gas,
+        in_bme_humidity_rh,
+        in_bme_pressure_hPa,
+        in_bme_altitude_m,
+        out_dht_temp_C,
+        out_dht_humidity_rh,
+        out_sgp_eCO2,
+        out_sgp_TVOC,
+        out_bme_temp_C,
+        out_bme_gas,
+        out_bme_humidity_rh,
+        out_bme_pressure_hPa,
+        out_bme_altitude_m,
     ):
         self.in_dht_temp_C = in_dht_temp_C
         self.in_dht_humidity_rh = in_dht_humidity_rh
