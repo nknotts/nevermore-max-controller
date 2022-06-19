@@ -2,7 +2,6 @@
 
 import struct
 
-
 START_BYTE = 0xA5
 META_LEN = 4  # start_byte + msg_id + len + crc
 MAX_MSG_LEN = 64
@@ -19,9 +18,9 @@ class MessagePacket:
 
     def serialize(self):
         msg_len = len(self.payload) + META_LEN
-        out = struct.pack("BBB", START_BYTE, msg_len, self.msg_id) + self.payload
+        out = bytes(struct.pack("BBB", START_BYTE, msg_len, self.msg_id) + self.payload)
         crc = calc_crc8(out)
-        return out + struct.pack("B", crc)
+        return out + bytes(struct.pack("B", crc))
 
     def __repr__(self):
         return "MessagePacket(msg_id=0x{:02X}, payload_len={}, payload='{}')".format(
