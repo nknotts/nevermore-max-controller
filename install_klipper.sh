@@ -25,7 +25,7 @@ check_klipper()
 link_extension()
 {
     echo "Linking extension to Klipper..."
-    ln -sf "${SRCDIR}/z_calibration.py" "${KLIPPER_PATH}/klippy/extras/z_calibration.py"
+    ln -sf "${SRCDIR}/nevermoremax" "${KLIPPER_PATH}/klippy/extras/nevermoremax"
 }
 
 # Step 3: restarting Klipper
