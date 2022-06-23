@@ -1,6 +1,6 @@
 import logging
+import serial
 
-from .serial import SerialPort
 from ..firmware import messagepacket
 from ..firmware import messages
 
@@ -65,10 +65,10 @@ class NevermoreMaxController:
         logging.info("NevermoreMaxController __init__")
         serial_port = config.get("serial")
         serial_baud = config.get("baud", default=115200)
-        self.serial = SerialPort(serial_port, serial_baud)
+        self.serial = serial.Serial(serial_port, serial_baud, timeout=0, write_timeout=0)
         self.serial_parser = messagepacket.MessageParser()
         self.printer = config.get_printer()
-        self.printer.get_reactor().register_fd(self.serial.fd, self._serial_data_ready)
+        self.printer.get_reactor().register_fd(self.serial.fileno(), self._serial_data_ready)
         self.intake_temperature_cb = lambda time, val: None
         self.exhaust_temperature_cb = lambda time, val: None
         self.gcode = self.printer.lookup_object('gcode')
@@ -101,7 +101,7 @@ class NevermoreMaxController:
         return self.measurement
 
     def _serial_data_ready(self, eventtime):
-        data = self.serial.read()
+        data = self.serial.read(self.serial.in_waiting)
 
         self.serial_parser.append(data)
         msg, _ = self.serial_parser.parse()
