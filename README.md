@@ -68,12 +68,13 @@ It's possible to keep this extension up to date with the Moonraker's [update man
 adding this configuration block to the "moonraker.conf" of your printer:
 
 ```text
-[update_manager client nevermore_max_controller]
+[update_manager nevermore_max_controller]
 type: git_repo
-path: ~/nevermore_max_controller
 origin: https://github.com/nknotts/nevermore-max-controller.git
+path: ~/nevermore-max-controller
 install_script: install_klipper.sh
 managed_services: klipper
+primary_branch: main
 ```
 
 This requires this repository to be cloned into your home directory (e.g. /home/pi):
