@@ -1,10 +1,14 @@
 import logging
 import serial
-import queue
 import threading
 import csv
 import time
 import os.path
+
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 from .firmware import messagepacket
 from .firmware import messages
