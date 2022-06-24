@@ -1,5 +1,10 @@
 import logging
 import serial
+import queue
+import threading
+import csv
+import time
+import os.path
 
 from .firmware import messagepacket
 from .firmware import messages
@@ -53,6 +58,8 @@ class NevermoreMaxController:
         logging.info("NevermoreMaxController __init__")
         serial_port = config.get("serial")
         serial_baud = config.get("baud", default=115200)
+        self.log_to_file = config.getboolean("log_to_file", False)
+        self.log_queue = queue.Queue()
         self.serial = serial.Serial(serial_port, serial_baud, timeout=0, write_timeout=0)
         self.serial_parser = messagepacket.MessageParser()
         self.printer = config.get_printer()
@@ -78,6 +85,31 @@ class NevermoreMaxController:
             desc="Set Nevermore Max Controller State")
 
         self.measurement = {}
+
+        if self.log_to_file:
+            threading.Thread(target=self._logging_worker).start()
+
+    def _logging_worker(self):
+        try:
+            log_file = self.printer.get_start_args()['log_file']
+            log_dir = os.path.dirname(log_file)
+        except KeyError:
+            log_dir = '/tmp'
+
+        log_file = os.path.join(log_dir, 'nevermore-max.csv')
+        logging.info("NevermoreMaxController: Opening Log File '{}'".format(log_file))
+
+        with open(log_file, 'w') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            csvwriter.writerow(['time', 'in_temp_C', 'out_temp_C'])
+
+            while True:
+                item = self.log_queue.get()
+                #logging.info('Working on {}'.format(item))
+                csvwriter.writerow([time.time(), item.in_bme_temp_C, item.out_bme_temp_C])
+                csvfile.flush()
+                self.log_queue.task_done()
+
 
     def setup_intake_temperature_callback(self, callback):
         self.intake_temperature_cb = callback
@@ -135,6 +167,9 @@ class NevermoreMaxController:
                     'temp_C': reading.out_bme_temp_C
                 }
             }
+            if self.log_to_file:
+                self.log_queue.put_nowait(reading)
+
         elif msg.msg_id == messages.VersionResponse.MsgId:
             version = messages.VersionResponse.from_message(msg)
             logging.info("Nevermore Max Firmware Version: {}".format(version.version))
