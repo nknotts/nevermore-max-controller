@@ -4,14 +4,17 @@ import serial
 from .firmware import messagepacket
 from .firmware import messages
 
-class IntakeTemperature:
-    def __init__(self, config):
+class NevermoreTemperature:
+    def __init__(self, config, setup_source_callback_name):
+        self.name = config.get_name().split()[-1]
         self.printer = config.get_printer()
         controller = self.printer.load_object(config, 'nevermoremax')
-        controller.setup_intake_temperature_callback(self.recv_tempeturate)
-        logging.info(controller)
+        setup_source_callback = getattr(controller, setup_source_callback_name)
+        setup_source_callback(self._recv_measurement)
         self.temperature_callback = lambda time, val: None
-        self.temp = self.min_temp = self.max_temp = 0
+        self.min_temp = self.max_temp = 0
+        self.printer.add_object("bme280 " + self.name, self) # display measurement data in mainail
+        self.measurement = {}
 
     def setup_minmax(self, min_temp, max_temp):
         self.min_temp = min_temp
@@ -20,45 +23,30 @@ class IntakeTemperature:
     def setup_callback(self, temperature_callback):
         self.temperature_callback = temperature_callback
 
-    def recv_tempeturate(self, eventtime, temp_C):
-        self.temperature_callback(eventtime, temp_C)
-        self.temp = temp_C
-        if self.temp < self.min_temp:
-            self.printer.invoke_shutdown(
-                "Nevermore intake temperature %0.1f below minimum temperature of %0.1f."
-                % (self.temp, self.min_temp,))
-        if self.temp > self.max_temp:
-            self.printer.invoke_shutdown(
-                "Nevermore intake  temperature %0.1f above maximum temperature of %0.1f."
-                % (self.temp, self.max_temp,))
+    def _recv_measurement(self, eventtime, measurement):
+        self.measurement = measurement
 
-class ExhaustTemperature:
-    def __init__(self, config):
-        self.printer = config.get_printer()
-        controller = self.printer.load_object(config, 'nevermoremax')
-        controller.setup_exhaust_temperature_callback(self.recv_tempeturate)
-        logging.info(controller)
-        self.temperature_callback = lambda time, val: None
-        self.temp = self.min_temp = self.max_temp = 0
+        temp = measurement['temperature']
+        self.temperature_callback(eventtime, temp)
 
-    def setup_minmax(self, min_temp, max_temp):
-        self.min_temp = min_temp
-        self.max_temp = max_temp
-
-    def setup_callback(self, temperature_callback):
-        self.temperature_callback = temperature_callback
-
-    def recv_tempeturate(self, eventtime, temp_C):
-        self.temperature_callback(eventtime, temp_C)
-        self.temp = temp_C
-        if self.temp < self.min_temp:
+        if temp < self.min_temp:
             self.printer.invoke_shutdown(
-                "Nevermore exhaust temperature %0.1f below minimum temperature of %0.1f."
-                % (self.temp, self.min_temp,))
-        if self.temp > self.max_temp:
+                "%s temperature %0.1f below minimum temperature of %0.1f."
+                % (self.name, temp, self.min_temp,))
+        if temp > self.max_temp:
             self.printer.invoke_shutdown(
-                "Nevermore exhaust  temperature %0.1f above maximum temperature of %0.1f."
-                % (self.temp, self.max_temp,))
+                "%s temperature %0.1f above maximum temperature of %0.1f."
+                % (self.name, temp, self.max_temp,))
+
+    def get_status(self, eventtime):
+        return self.measurement
+
+
+def create_intake(config):
+    return NevermoreTemperature(config, 'setup_intake_temperature_callback')
+
+def create_exhaust(config):
+    return NevermoreTemperature(config, 'setup_exhaust_temperature_callback')
 
 class NevermoreMaxController:
     def __init__(self, config):
@@ -127,8 +115,18 @@ class NevermoreMaxController:
         if msg.msg_id == messages.SensorReading.MsgId:
             reading = messages.SensorReading.from_message(msg)
             #logging.info("Received: {}".format(reading))
-            self.intake_temperature_cb(eventtime, reading.in_bme_temp_C)
-            self.exhaust_temperature_cb(eventtime, reading.out_bme_temp_C)
+            self.intake_temperature_cb(eventtime, {
+                'temperature': reading.in_bme_temp_C,
+                'humidity': reading.in_bme_humidity_rh,
+                'pressure': reading.in_bme_pressure_hPa,
+                'gas': reading.in_bme_gas
+            })
+            self.exhaust_temperature_cb(eventtime, {
+                'temperature': reading.out_bme_temp_C,
+                'humidity': reading.out_bme_humidity_rh,
+                'pressure': reading.out_bme_pressure_hPa,
+                'gas': reading.out_bme_gas
+            })
             self.measurement = {
                 'intake': {
                     'temp_C': reading.in_bme_temp_C
@@ -149,7 +147,7 @@ class NevermoreMaxController:
 
 def load_config(config):
     pheater = config.get_printer().lookup_object("heaters")
-    pheater.add_sensor_factory("nevermore_intake_temperature", IntakeTemperature)
-    pheater.add_sensor_factory("nevermore_exhaust_temperature", ExhaustTemperature)
+    pheater.add_sensor_factory("nevermore_intake", create_intake)
+    pheater.add_sensor_factory("nevermore_exhaust", create_exhaust)
 
     return NevermoreMaxController(config)
