@@ -153,15 +153,11 @@ class NevermoreMaxController:
             #logging.info("Received: {}".format(reading))
             self.intake_temperature_cb(eventtime, {
                 'temperature': reading.in_bme_temp_C,
-                'humidity': reading.in_bme_humidity_rh,
-                'pressure': reading.in_bme_pressure_hPa,
-                'gas': reading.in_bme_gas
+                'tvoc': reading.in_sgp_TVOC
             })
             self.exhaust_temperature_cb(eventtime, {
                 'temperature': reading.out_bme_temp_C,
-                'humidity': reading.out_bme_humidity_rh,
-                'pressure': reading.out_bme_pressure_hPa,
-                'gas': reading.out_bme_gas
+                'tvoc': reading.out_sgp_TVOC
             })
             self.measurement = {
                 'intake': {
