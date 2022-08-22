@@ -4,6 +4,10 @@
 
 Nevermore Max Controller source code
 
+>:heavy_exclamation_mark: **NOTE:** This repository is a proof-of-concept only
+> and is not actively developed. Current efforts are being developed at
+> [nknotts/klipper-nevermore-max](https://github.com/nknotts/klipper-nevermore-max)
+
 ## HOWTO
 
 ### Firmware
